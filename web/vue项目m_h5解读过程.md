@@ -51,6 +51,7 @@ moment.locale('zh-cn');
 moment.suppressDeprecationWarnings = true;
 
 // 路由发生变化，通过全局前置守卫处理路由内容
+/// 留个疑问？？？是否能讲该全局前置守卫放到router.js或者router/index.js中
 router.beforeEach((to, from, next) => {
     /**
     to 和 from 都是路由对象，即 在router.js或router/index.js文件中
@@ -66,7 +67,7 @@ router.beforeEach((to, from, next) => {
     clearTimeout(window.keye_2);
     // 修改title
     /**
-    在路由对象中添加meta
+    在路由对象中添加路由元信息meta
     meta: {
 		keepAlive: true,
 	}
@@ -109,7 +110,9 @@ export default {
 
 ```
 
+[导航守卫链接](https://router.vuejs.org/zh/guide/advanced/navigation-guards.html)
 
+[路由元meta信息链接](https://router.vuejs.org/zh/guide/advanced/meta.html)
 
 查看`main.js`中包含的文件`import App from './App.vue';`
 
@@ -186,6 +189,25 @@ const routes = [
         name: 'flightList',
         component: FlightList,
     },
+    {
+        // 嵌套路由，该路由作为样式展示在代码中
+        /**
+        	访问 bar 使用 '/foo/bar',
+        	children中的子路由可根据需要进行选择，父路由的内容样式保持不变
+        */
+        path: '/foo',
+        component: Foo,
+        children: [
+            {
+                path: 'bar',
+                component: Bar,            
+            },
+            {
+                path: 'bal',
+                component: Bal,
+            }
+        ]
+    },
     ...
     // 捕获所有路由
    	{	
@@ -195,6 +217,13 @@ const routes = [
         redirect: '/',
     }
 ];
+
+const router = new VueRouter({
+    // 设置vue-router的模式
+	mode: 'history',
+    base: process.env.BASE_URL,
+    routes,
+});
 ```
 
 在注入路由器之后，可以在任何组件内通过`this.$router`访问路由器，也可以通过`this.$route`访问当前路由。在`this.$route`中访问参数时，使用`param`访问`url`中的参数，如
@@ -240,4 +269,19 @@ export default {
 ```
 
  `this.$route`还提供其他信息`$route.query` (如果 URL 中有查询参数)、`$route.hash` 等等，具体参考[API文档](https://router.vuejs.org/zh/api/#%E8%B7%AF%E7%94%B1%E5%AF%B9%E8%B1%A1)
+
+HTML5 History 模式
+
+`vue-router`默认是hash模式——使用`URL`的`hash`来模拟一个完整的`URL`，当`URL`改变时，页面不会重新加载。
+
+默认`hash`模式下，访问路由的`url`端口后必须添加`#`，`http://localhost:8080/#/home`。
+
+```javascript
+const router = new VueRouter({
+	mode: 'history',
+    routes: [...],
+});
+```
+
+
 
